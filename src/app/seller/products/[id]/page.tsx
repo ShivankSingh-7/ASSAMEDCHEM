@@ -60,6 +60,10 @@ export default function ProductDetailPage({ params }: Props) {
   );
 
   function addToCart() {
+    if (convertedQuantity > Number(product!.stockQuantity)) {
+      alert(`Order quantity (${convertedQuantity} ${product!.baseUnit}) exceeds available stock (${product!.stockQuantity} ${product!.baseUnit}).`);
+      return;
+    }
     setAdding(true);
     const existing = JSON.parse(sessionStorage.getItem("cart") ?? "[]");
     const item = {

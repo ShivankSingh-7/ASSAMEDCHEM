@@ -34,13 +34,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     data: { status },
   });
 
-  // If approved, unlist the associated products
+  // If approved, deduct stock and unlist if exhausted
   if (status === "APPROVED") {
-    const productIds = quotation.items.map((item) => item.productId);
-    await prisma.product.updateMany({
-      where: { id: { in: productIds } },
-      data: { status: "UNLISTED" },
-    });
+    for (const item of quotation.items) {
+      const product = await prisma.product.findUnique({ where: { id: item.productId } });
+      if (product) {
+        const newStock = Number(product.stockQuantity) - Number(item.convertedQuantity);
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: {
+            stockQuantity: newStock < 0 ? 0 : newStock,
+            status: newStock <= 0 ? "UNLISTED" : "ACTIVE",
+          },
+        });
+      }
+    }
   }
 
   return NextResponse.json(updatedQuotation);
