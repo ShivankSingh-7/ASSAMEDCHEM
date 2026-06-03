@@ -13,7 +13,7 @@ export default async function TopBar({ title }: { title: string }) {
           </p>
           <p className="text-xs text-slate-500">{session?.user.email}</p>
         </div>
-        <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
           <span className="text-xs font-bold text-white">
             {session?.user.name?.[0]?.toUpperCase() ?? "U"}
           </span>

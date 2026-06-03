@@ -18,7 +18,7 @@ export default function EditProductPage({ params }: Props) {
   const router = useRouter();
   const [form, setForm] = useState({
     name: "", sku: "", category: "", description: "",
-    baseUnit: "g", basePrice: "", stockQuantity: "",
+    baseUnit: "kg", basePrice: "", stockQuantity: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,7 +71,7 @@ export default function EditProductPage({ params }: Props) {
   if (fetching) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -96,15 +96,15 @@ export default function EditProductPage({ params }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Product Name *</label>
-              <input name="name" value={form.name} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              <input name="name" value={form.name} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">SKU *</label>
-              <input name="sku" value={form.sku} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              <input name="sku" value={form.sku} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Category *</label>
-              <select name="category" value={form.category} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+              <select name="category" value={form.category} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                 <option value="">Select</option>
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -117,22 +117,22 @@ export default function EditProductPage({ params }: Props) {
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Base Price * <span className="text-slate-400 font-normal">({unitLabel})</span></label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">₹</span>
-                <input name="basePrice" type="number" value={form.basePrice} onChange={handleChange} required step="0.0001" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input name="basePrice" type="number" value={form.basePrice} onChange={handleChange} required step="0.0001" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Stock Qty * <span className="text-slate-400 font-normal">(in {form.baseUnit})</span></label>
-              <input name="stockQuantity" type="number" value={form.stockQuantity} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              <input name="stockQuantity" type="number" value={form.stockQuantity} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
-              <textarea name="description" value={form.description} onChange={handleChange} rows={3} className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+              <textarea name="description" value={form.description} onChange={handleChange} rows={3} className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
             </div>
           </div>
 
           <div className="flex gap-3 pt-2">
             <Link href={`/seller/products/${id}`} className="flex-1 text-center px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Cancel</Link>
-            <button type="submit" disabled={loading} className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {loading ? "Saving..." : "Save Changes"}
             </button>

@@ -50,7 +50,7 @@ export default function SellerQuotationsPage() {
     <div>
       <div className="h-16 bg-white border-b border-slate-200 flex items-center px-6">
         <div className="flex items-center gap-3">
-          <FileText className="w-5 h-5 text-green-600" />
+          <FileText className="w-5 h-5 text-blue-600" />
           <h1 className="text-lg font-semibold text-slate-900">My Quotations</h1>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function SellerQuotationsPage() {
             onClick={() => { setActiveTab("purchases"); setExpandedId(null); }}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "purchases"
-                ? "border-green-600 text-green-600"
+                ? "border-blue-600 text-blue-600"
                 : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
             }`}
           >
@@ -71,7 +71,7 @@ export default function SellerQuotationsPage() {
             onClick={() => { setActiveTab("sales"); setExpandedId(null); }}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "sales"
-                ? "border-green-600 text-green-600"
+                ? "border-blue-600 text-blue-600"
                 : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
             }`}
           >
@@ -83,7 +83,7 @@ export default function SellerQuotationsPage() {
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
           </div>
         ) : displayQuotations.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 py-16 text-center">
@@ -140,7 +140,7 @@ export default function SellerQuotationsPage() {
                             });
                             window.location.reload();
                           }}
-                          className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                          className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                         >
                           Approve
                         </button>

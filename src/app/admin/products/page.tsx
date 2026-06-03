@@ -55,7 +55,7 @@ export default function AdminProductsPage() {
         <h1 className="text-lg font-semibold text-slate-900">Products</h1>
         <Link
           href="/admin/products/new"
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Product
@@ -72,7 +72,7 @@ export default function AdminProductsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -131,7 +131,7 @@ export default function AdminProductsPage() {
                       <p className="text-xs text-slate-500">{p.seller?.email ?? "Admin added"}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="bg-green-50 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-green-100">
+                      <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-100">
                         {p.category}
                       </span>
                     </td>
@@ -151,7 +151,7 @@ export default function AdminProductsPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/admin/products/${p.id}/edit`}
-                          className="p-1.5 rounded-lg hover:bg-green-50 text-slate-500 hover:text-green-600 transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors"
                           title="Edit"
                         >
                           <Pencil className="w-4 h-4" />

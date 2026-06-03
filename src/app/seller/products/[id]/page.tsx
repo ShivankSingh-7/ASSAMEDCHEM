@@ -49,7 +49,7 @@ export default function ProductDetailPage({ params }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function ProductDetailPage({ params }: Props) {
           {/* Product info */}
           <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
             <div>
-              <span className="bg-green-50 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-green-100">
+              <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-100">
                 {product.category}
               </span>
             </div>
@@ -148,7 +148,7 @@ export default function ProductDetailPage({ params }: Props) {
               <div className="mt-4 w-full">
                 <Link
                   href={`/seller/products/${product.id}/edit`}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   <Pencil className="w-4 h-4" />
                   Edit Product
@@ -171,7 +171,7 @@ export default function ProductDetailPage({ params }: Props) {
                 step="any"
                 value={quantity}
                 onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -188,8 +188,8 @@ export default function ProductDetailPage({ params }: Props) {
                     onClick={() => setUnit(u)}
                     className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
                       unit === u
-                        ? "bg-green-600 text-white border-green-600"
-                        : "border-slate-300 text-slate-700 hover:border-green-400"
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "border-slate-300 text-slate-700 hover:border-blue-400"
                     }`}
                   >
                     {formatUnit(u)}
@@ -226,7 +226,7 @@ export default function ProductDetailPage({ params }: Props) {
                 </div>
                 <div className="border-t border-slate-200 pt-2.5 flex justify-between">
                   <span className="font-semibold text-slate-900">Total Price</span>
-                  <span className="font-bold text-green-600 text-lg">
+                  <span className="font-bold text-blue-600 text-lg">
                     {formatINR(calculatedPrice)}
                   </span>
                 </div>
@@ -239,8 +239,8 @@ export default function ProductDetailPage({ params }: Props) {
               disabled={!quantity || quantity <= 0 || adding}
               className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 success
-                  ? "bg-green-600 text-white"
-                  : "bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white"
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white"
               }`}
             >
               <ShoppingCart className="w-4 h-4" />
@@ -249,7 +249,7 @@ export default function ProductDetailPage({ params }: Props) {
 
             <Link
               href="/seller/cart"
-              className="block w-full text-center text-sm text-green-600 hover:text-green-700 font-medium"
+              className="block w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
               View Cart →
             </Link>

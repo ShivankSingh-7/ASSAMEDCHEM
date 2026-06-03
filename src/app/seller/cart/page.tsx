@@ -75,11 +75,11 @@ export default function CartPage() {
     <div>
       <div className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6">
         <div className="flex items-center gap-3">
-          <ShoppingCart className="w-5 h-5 text-green-600" />
+          <ShoppingCart className="w-5 h-5 text-blue-600" />
           <h1 className="text-lg font-semibold text-slate-900">My Cart</h1>
         </div>
         {items.length > 0 && (
-          <span className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+          <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
             {items.length}
           </span>
         )}
@@ -101,7 +101,7 @@ export default function CartPage() {
             </p>
             <Link
               href="/seller/products"
-              className="mt-4 inline-flex items-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              className="mt-4 inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             >
               Browse Products
             </Link>
@@ -171,7 +171,7 @@ export default function CartPage() {
               </div>
               <div className="border-t border-slate-200 mt-4 pt-4 flex justify-between">
                 <span className="font-bold text-slate-900">Grand Total</span>
-                <span className="font-bold text-green-600 text-xl">
+                <span className="font-bold text-blue-600 text-xl">
                   {formatINR(grandTotal)}
                 </span>
               </div>
@@ -180,7 +180,7 @@ export default function CartPage() {
                 id="submit-quotation-btn"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="w-full mt-4 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 {submitting ? "Submitting..." : "Submit Quotation Request"}

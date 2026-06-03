@@ -30,8 +30,8 @@ export default async function SellerDashboard() {
       label: "Total Quotations",
       value: allQuotations.length,
       icon: FileText,
-      color: "text-green-600",
-      bg: "bg-green-50",
+      color: "text-blue-600",
+      bg: "bg-blue-50",
     },
     {
       label: "Pending",
@@ -44,8 +44,8 @@ export default async function SellerDashboard() {
       label: "Approved",
       value: approved,
       icon: CheckCircle,
-      color: "text-green-600",
-      bg: "bg-green-50",
+      color: "text-blue-600",
+      bg: "bg-blue-50",
     },
     {
       label: "Rejected",
@@ -61,16 +61,16 @@ export default async function SellerDashboard() {
       <TopBar title="Dashboard" />
       <div className="p-6 space-y-6">
         {/* Welcome */}
-        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 text-white">
           <h2 className="text-lg font-semibold">
             Welcome back, {session?.user.name?.split(" ")[0]}! 👋
           </h2>
-          <p className="text-green-100 text-sm mt-1">
+          <p className="text-blue-100 text-sm mt-1">
             Browse products and submit quotation requests.
           </p>
           <Link
             href="/seller/products"
-            className="inline-flex items-center mt-4 bg-white text-green-600 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-green-50 transition-colors"
+            className="inline-flex items-center mt-4 bg-white text-blue-600 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
           >
             Browse Products →
           </Link>
@@ -98,13 +98,13 @@ export default async function SellerDashboard() {
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-slate-900">Recent Quotations</h2>
-            <Link href="/seller/quotations" className="text-xs text-green-600 hover:text-green-700 font-medium">View all →</Link>
+            <Link href="/seller/quotations" className="text-xs text-blue-600 hover:text-blue-700 font-medium">View all →</Link>
           </div>
           <div className="divide-y divide-slate-100">
             {quotations.length === 0 && (
               <div className="py-10 text-center text-slate-400 text-sm">
                 No quotations yet.{" "}
-                <Link href="/seller/products" className="text-green-600 hover:underline">
+                <Link href="/seller/products" className="text-blue-600 hover:underline">
                   Browse products
                 </Link>{" "}
                 to get started.

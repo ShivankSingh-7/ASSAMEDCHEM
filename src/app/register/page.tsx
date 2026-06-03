@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Package, Loader2 } from "lucide-react";
+import { FlaskConical, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -30,9 +30,9 @@ export default function RegisterPage() {
       body: JSON.stringify({ name, email, password }),
     });
 
-    const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Registration failed");
+      const data = await res.json();
+      setError(data.error || "Registration failed");
       setLoading(false);
       return;
     }
@@ -47,13 +47,13 @@ export default function RegisterPage() {
           {/* Header */}
           <div className="px-8 pt-8 pb-6 border-b border-slate-100">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center">
-                <Package className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                <FlaskConical className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-bold text-slate-900">IQM System</p>
+                <p className="font-bold text-slate-900">ASSAMEDCHAM</p>
                 <p className="text-xs text-slate-500">
-                  Inventory & Quotation Management
+                  Pharmaceutical B2B Marketplace
                 </p>
               </div>
             </div>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
@@ -99,7 +99,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min. 6 characters"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
@@ -122,7 +122,7 @@ export default function RegisterPage() {
               id="register-btn"
               type="submit"
               disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mt-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mt-2"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {loading ? "Creating account..." : "Create Account"}
@@ -134,7 +134,7 @@ export default function RegisterPage() {
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="text-green-600 hover:text-green-700 font-medium"
+                className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Sign in
               </Link>

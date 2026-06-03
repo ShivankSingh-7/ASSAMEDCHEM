@@ -25,7 +25,7 @@ const CATEGORIES = ["Food", "Chemical", "Medical", "Pharmaceutical", "Industrial
 
 const EMPTY_FORM = {
   name: "", sku: "", category: "", description: "",
-  baseUnit: "g", basePrice: "", stockQuantity: "",
+  baseUnit: "kg", basePrice: "", stockQuantity: "",
 };
 
 export default function SellerListingsPage() {
@@ -107,7 +107,7 @@ export default function SellerListingsPage() {
         </div>
         <button
           onClick={() => { setShowForm(!showForm); setError(""); }}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <PlusCircle className="w-4 h-4" />
           {showForm ? "Cancel" : "Submit New Product"}
@@ -116,13 +116,13 @@ export default function SellerListingsPage() {
 
       <div className="p-6 space-y-5 max-w-4xl">
         {/* How it works banner */}
-        <div className="bg-green-50 border border-green-100 rounded-xl px-5 py-4 flex gap-4 items-start">
-          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span className="text-green-600 text-sm font-bold">?</span>
+        <div className="bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 flex gap-4 items-start">
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-blue-600 text-sm font-bold">?</span>
           </div>
           <div>
-            <p className="text-sm font-semibold text-green-900">How seller listings work</p>
-            <p className="text-sm text-green-700 mt-1">
+            <p className="text-sm font-semibold text-blue-900">How seller listings work</p>
+            <p className="text-sm text-blue-700 mt-1">
               Submit a product below. The Admin will review it and either <strong>approve</strong> (it appears in the catalog) or <strong>reject</strong> it with a note.
             </p>
           </div>
@@ -145,15 +145,15 @@ export default function SellerListingsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Product Name *</label>
-                <input name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Organic Turmeric" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Organic Turmeric" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">SKU *</label>
-                <input name="sku" value={form.sku} onChange={handleChange} required placeholder="e.g. TUR-001" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input name="sku" value={form.sku} onChange={handleChange} required placeholder="e.g. TUR-001" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Category *</label>
-                <select name="category" value={form.category} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select name="category" value={form.category} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Select category</option>
                   {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -168,24 +168,24 @@ export default function SellerListingsPage() {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">₹</span>
-                  <input name="basePrice" type="number" value={form.basePrice} onChange={handleChange} required min="0" step="0.0001" placeholder="0.0000" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  <input name="basePrice" type="number" value={form.basePrice} onChange={handleChange} required min="0" step="0.0001" placeholder="0.0000" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">
                   Stock Qty * <span className="font-normal text-slate-400">(in {form.baseUnit})</span>
                 </label>
-                <input name="stockQuantity" type="number" value={form.stockQuantity} onChange={handleChange} required min="0" step="0.01" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <input name="stockQuantity" type="number" value={form.stockQuantity} onChange={handleChange} required min="0" step="0.01" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
-                <textarea name="description" value={form.description} onChange={handleChange} rows={2} placeholder="Optional description..." className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+                <textarea name="description" value={form.description} onChange={handleChange} rows={2} placeholder="Optional description..." className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
               </div>
             </div>
 
-            {form.basePrice && (form.baseUnit === "g" || form.baseUnit === "mL") && (
-              <div className="bg-green-50 border border-green-100 rounded-lg px-4 py-2.5 text-sm text-green-700">
-                💡 Equals <strong>₹{(parseFloat(form.basePrice) * 1000).toFixed(2)} per {form.baseUnit === "g" ? "kg" : "L"}</strong>
+            {form.basePrice && (form.baseUnit === "mg" || form.baseUnit === "mL") && (
+              <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 text-sm text-blue-700">
+                💡 Equals <strong>₹{(parseFloat(form.basePrice) * (form.baseUnit === "mg" ? 1000000 : 1000)).toFixed(2)} per {form.baseUnit === "mg" ? "kg" : "L"}</strong>
               </div>
             )}
 
@@ -193,7 +193,7 @@ export default function SellerListingsPage() {
               <button type="button" onClick={() => setShowForm(false)} className="flex-1 text-center px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                 Cancel
               </button>
-              <button type="submit" disabled={submitting} className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+              <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 {submitting ? "Submitting..." : "Submit for Review"}
               </button>
@@ -205,7 +205,7 @@ export default function SellerListingsPage() {
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-5 h-5 animate-spin text-green-600" />
+              <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
             </div>
           ) : listings.length === 0 ? (
             <div className="py-14 text-center text-slate-400">
@@ -234,7 +234,7 @@ export default function SellerListingsPage() {
                       </td>
                       <td className="px-6 py-4 font-mono text-xs text-slate-500">{l.sku}</td>
                       <td className="px-6 py-4">
-                        <span className="bg-green-50 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-green-100">{l.category}</span>
+                        <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-100">{l.category}</span>
                       </td>
                       <td className="px-6 py-4 font-medium text-slate-900">
                         {formatDisplayPrice(Number(l.basePrice), l.baseUnit)}

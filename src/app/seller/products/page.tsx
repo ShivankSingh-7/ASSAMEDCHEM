@@ -57,7 +57,7 @@ export default function SellerProductsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="relative">
@@ -66,7 +66,7 @@ export default function SellerProductsPage() {
               id="category-filter"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
@@ -91,7 +91,7 @@ export default function SellerProductsPage() {
               >
                 {/* Category badge */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="bg-green-50 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-green-100">
+                  <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-100">
                     {p.category}
                   </span>
                   <span className="text-xs text-slate-400 font-mono">{p.sku}</span>
@@ -121,7 +121,7 @@ export default function SellerProductsPage() {
 
                   <Link
                     href={`/seller/products/${p.id}`}
-                    className="w-full block text-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                    className="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded-lg transition-colors"
                   >
                     View Details
                   </Link>

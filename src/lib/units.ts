@@ -8,36 +8,21 @@
 //   e.g. ordered 500 g, baseUnit = kg → 500 × (1/1000) = 0.5 kg → 0.5 × pricePerKg
 
 // ─── Conversion factors (relative to category anchor) ───────────────────────
-// Weight anchor = 1 g
+// Weight anchor = 1 mg
 export const WEIGHT_FACTORS: Record<string, number> = {
-  mg: 0.001,
-  g: 1,
-  kg: 1000,
-  tonne: 1_000_000,
+  mg: 1,
+  kg: 1_000_000,
 };
 
 // Volume anchor = 1 mL
 export const VOLUME_FACTORS: Record<string, number> = {
-  "µL": 0.001,
   mL: 1,
   L: 1000,
-  kL: 1_000_000,
 };
 
 // Count — discrete units (factor = how many "base units" 1 of these equals)
 export const COUNT_FACTORS: Record<string, number> = {
   unit: 1,
-  tablet: 1,
-  capsule: 1,
-  vial: 1,
-  ampoule: 1,
-  bottle: 1,
-  strip: 1,
-  box: 1,
-  pack: 1,
-  carton: 1,
-  dozen: 12,
-  gross: 144,
 };
 
 // ─── Grouped unit options for forms ─────────────────────────────────────────
@@ -46,35 +31,20 @@ export const UNIT_GROUPS = [
     group: "Weight",
     units: [
       { value: "mg", label: "mg — milligram" },
-      { value: "g", label: "g — gram" },
       { value: "kg", label: "kg — kilogram" },
-      { value: "tonne", label: "tonne — metric ton" },
     ],
   },
   {
     group: "Volume",
     units: [
-      { value: "µL", label: "µL — microlitre" },
       { value: "mL", label: "mL — millilitre" },
       { value: "L", label: "L — litre" },
-      { value: "kL", label: "kL — kilolitre" },
     ],
   },
   {
     group: "Count",
     units: [
       { value: "unit", label: "unit" },
-      { value: "tablet", label: "tablet" },
-      { value: "capsule", label: "capsule" },
-      { value: "vial", label: "vial" },
-      { value: "ampoule", label: "ampoule" },
-      { value: "bottle", label: "bottle" },
-      { value: "strip", label: "strip" },
-      { value: "box", label: "box" },
-      { value: "pack", label: "pack" },
-      { value: "carton", label: "carton" },
-      { value: "dozen", label: "dozen (×12)" },
-      { value: "gross", label: "gross (×144)" },
     ],
   },
 ];

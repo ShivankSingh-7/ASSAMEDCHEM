@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Package,
+  FlaskConical,
+  Pill,
   FileText,
   LogOut,
   ChevronRight,
@@ -14,7 +15,7 @@ import {
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/products", label: "Products", icon: Pill },
   { href: "/admin/listings", label: "Seller Submissions", icon: ClipboardList },
   { href: "/admin/quotations", label: "Quotations", icon: FileText },
 ];
@@ -26,12 +27,12 @@ export default function AdminSidebar() {
     <aside className="flex flex-col w-64 h-full bg-white border-r border-slate-200">
       {/* Brand */}
       <div className="flex items-center gap-2 px-6 py-5 border-b border-slate-200">
-        <div className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center">
-          <Package className="w-4 h-4 text-white" />
+        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+          <FlaskConical className="w-4 h-4 text-white" />
         </div>
         <div>
           <p className="text-sm font-bold text-slate-900">IQM System</p>
-          <p className="text-xs text-green-600 font-medium">Admin Panel</p>
+          <p className="text-xs text-blue-600 font-medium">Admin Panel</p>
         </div>
       </div>
 
@@ -46,7 +47,7 @@ export default function AdminSidebar() {
               href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group ${
                 isActive
-                  ? "bg-green-50 text-green-600"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >

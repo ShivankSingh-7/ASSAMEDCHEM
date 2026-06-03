@@ -64,7 +64,7 @@ export default function AdminQuotationsPage() {
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+              <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
             </div>
           ) : quotations.length === 0 ? (
             <div className="py-16 text-center text-slate-400">
@@ -125,7 +125,7 @@ export default function AdminQuotationsPage() {
                               updateStatus(q.id, e.target.value)
                             }
                             disabled={updating === q.id}
-                            className="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
+                            className="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none pr-8 cursor-pointer disabled:opacity-50"
                           >
                             <option value="PENDING">Pending</option>
                             <option value="APPROVED">Approved</option>

@@ -21,7 +21,7 @@ export default function UnitSelect({
       name={name}
       value={value}
       onChange={onChange}
-      className={`w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${className}`}
+      className={`w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
     >
       {UNIT_GROUPS.map((group) => (
         <optgroup key={group.group} label={`── ${group.group} ──`}>
