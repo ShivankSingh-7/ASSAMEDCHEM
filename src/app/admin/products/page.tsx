@@ -13,6 +13,7 @@ type Product = {
   baseUnit: string;
   basePrice: number;
   stockQuantity: number;
+  status: string;
 };
 
 export default function AdminProductsPage() {
@@ -80,7 +81,7 @@ export default function AdminProductsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  {["Name", "SKU", "Category", "Base Unit", "Price", "Stock", "Actions"].map(
+                  {["Name", "SKU", "Category", "Base Unit", "Price", "Stock", "Status", "Actions"].map(
                     (h) => (
                       <th
                         key={h}
@@ -135,6 +136,11 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-6 py-4 text-slate-600">
                       {Number(p.stockQuantity).toLocaleString()} {p.baseUnit}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${p.status === "ACTIVE" ? "bg-green-50 text-green-700 border-green-100" : "bg-slate-100 text-slate-700 border-slate-200"}`}>
+                        {p.status}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">

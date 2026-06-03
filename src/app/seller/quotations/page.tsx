@@ -16,6 +16,8 @@ type QuotationItem = {
 
 type Quotation = {
   id: string;
+  userId: string;
+  sellerId: string | null;
   totalAmount: number;
   status: string;
   createdAt: string;
@@ -24,17 +26,25 @@ type Quotation = {
 
 export default function SellerQuotationsPage() {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"purchases" | "sales">("purchases");
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/quotations")
-      .then((r) => r.json())
-      .then((data) => {
-        setQuotations(data);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch("/api/auth/session").then((r) => r.json()),
+      fetch("/api/quotations").then((r) => r.json())
+    ]).then(([sessionData, quotationsData]) => {
+      setCurrentUserId(sessionData?.user?.id || "");
+      setQuotations(quotationsData);
+      setLoading(false);
+    });
   }, []);
+
+  const purchases = quotations.filter((q) => q.userId === currentUserId);
+  const sales = quotations.filter((q) => q.sellerId === currentUserId);
+  const displayQuotations = activeTab === "purchases" ? purchases : sales;
 
   return (
     <div>
@@ -45,63 +55,115 @@ export default function SellerQuotationsPage() {
         </div>
       </div>
 
+      <div className="px-6 pt-4 border-b border-slate-200 bg-white">
+        <div className="flex gap-6">
+          <button
+            onClick={() => { setActiveTab("purchases"); setExpandedId(null); }}
+            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "purchases"
+                ? "border-green-600 text-green-600"
+                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+            }`}
+          >
+            My Purchases
+          </button>
+          <button
+            onClick={() => { setActiveTab("sales"); setExpandedId(null); }}
+            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "sales"
+                ? "border-green-600 text-green-600"
+                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+            }`}
+          >
+            Sales Requests
+          </button>
+        </div>
+      </div>
+
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-6 h-6 animate-spin text-green-600" />
           </div>
-        ) : quotations.length === 0 ? (
+        ) : displayQuotations.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 py-16 text-center">
             <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500 font-medium">No quotations yet</p>
-            <p className="text-sm text-slate-400 mt-1">
-              Browse products and add items to cart to create a quotation request
-            </p>
+            <p className="text-slate-500 font-medium">No {activeTab === "purchases" ? "purchases" : "sales requests"} yet</p>
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
             <div className="divide-y divide-slate-100">
-              {quotations.map((q) => (
+              {displayQuotations.map((q) => (
                 <div key={q.id}>
-                  <button
-                    onClick={() =>
-                      setExpandedId(expandedId === q.id ? null : q.id)
-                    }
-                    className="w-full px-6 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors text-left"
-                  >
-                    <ChevronDown
-                      className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${
-                        expandedId === q.id ? "rotate-180" : ""
-                      }`}
-                    />
-                    <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-4 items-center">
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">
-                          #{q.id.slice(-8)}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {new Date(q.createdAt).toLocaleDateString("en-IN")}
-                        </p>
+                  <div className="flex items-center justify-between w-full px-6 py-4 hover:bg-slate-50 transition-colors">
+                    <button
+                      onClick={() => setExpandedId(expandedId === q.id ? null : q.id)}
+                      className="flex-1 flex items-center gap-4 text-left"
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${
+                          expandedId === q.id ? "rotate-180" : ""
+                        }`}
+                      />
+                      <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-4 items-center">
+                        <div>
+                          <p className="text-sm font-medium text-slate-900">
+                            #{q.id.slice(-8)}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {new Date(q.createdAt).toLocaleDateString("en-IN")}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-slate-500">
+                            {q.items.length} item(s)
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">
+                            {formatINR(Number(q.totalAmount))}
+                          </p>
+                        </div>
+                        <div className="hidden sm:block">
+                          <StatusBadge status={q.status} />
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-slate-500">
-                          {q.items.length} item(s)
-                        </p>
+                    </button>
+                    {activeTab === "sales" && q.status === "PENDING" && (
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={async () => {
+                            await fetch(`/api/quotations/${q.id}`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ status: "APPROVED" }),
+                            });
+                            window.location.reload();
+                          }}
+                          className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={async () => {
+                            await fetch(`/api/quotations/${q.id}`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ status: "REJECTED" }),
+                            });
+                            window.location.reload();
+                          }}
+                          className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                        >
+                          Reject
+                        </button>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          {formatINR(Number(q.totalAmount))}
-                        </p>
-                      </div>
-                      <div className="hidden sm:block">
-                        <StatusBadge status={q.status} />
-                      </div>
-                    </div>
-                  </button>
+                    )}
+                  </div>
 
                   {expandedId === q.id && (
                     <div className="px-6 pb-4 bg-slate-50 border-t border-slate-100">
-                      <div className="sm:hidden mb-3">
+                      <div className="sm:hidden mb-3 pt-3">
                         <StatusBadge status={q.status} />
                       </div>
                       <table className="w-full text-sm mt-4">

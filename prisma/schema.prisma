@@ -15,10 +15,12 @@ model User {
   name            String
   email           String           @unique
   password        String
-  role            Role             @default(SELLER)
-  createdAt       DateTime         @default(now())
-  quotations      Quotation[]
-  productListings ProductListing[]
+  role               Role             @default(SELLER)
+  createdAt          DateTime         @default(now())
+  sentQuotations     Quotation[]      @relation("BuyerQuotations")
+  receivedQuotations Quotation[]      @relation("SellerQuotations")
+  productListings    ProductListing[]
+  products           Product[]        @relation("SellerProducts")
 }
 
 model Product {
@@ -28,10 +30,13 @@ model Product {
   category       String
   description    String?
   baseUnit       String // "g", "mL", "unit"
-  basePrice      Decimal         @db.Decimal(12, 4) // price per baseUnit
-  stockQuantity  Decimal         @db.Decimal(12, 4)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  basePrice      Decimal       @db.Decimal(12, 4) // price per baseUnit
+  stockQuantity  Decimal       @db.Decimal(12, 4)
+  sellerId       String?       // Seller who owns this product (null if Admin-created)
+  seller         User?         @relation("SellerProducts", fields: [sellerId], references: [id])
+  status         ProductStatus @default(ACTIVE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   quotationItems QuotationItem[]
 }
 
@@ -55,8 +60,10 @@ model ProductListing {
 
 model Quotation {
   id          String          @id @default(cuid())
-  userId      String
-  user        User            @relation(fields: [userId], references: [id])
+  userId      String          // The BUYER
+  user        User            @relation("BuyerQuotations", fields: [userId], references: [id])
+  sellerId    String?         // The SELLER receiving the quotation
+  seller      User?           @relation("SellerQuotations", fields: [sellerId], references: [id])
   totalAmount Decimal         @db.Decimal(12, 4)
   status      QuotationStatus @default(PENDING)
   createdAt   DateTime        @default(now())
@@ -90,4 +97,9 @@ enum ProductListingStatus {
   DRAFT    // submitted by seller, awaiting admin review
   APPROVED // admin approved — now visible in catalog as Product
   REJECTED // admin rejected
+}
+
+enum ProductStatus {
+  ACTIVE
+  UNLISTED
 }

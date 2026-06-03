@@ -8,8 +8,12 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get("search") ?? "";
   const category = searchParams.get("category") ?? "";
 
+  const session = await auth();
+  const isAdmin = session?.user.role === "ADMIN";
+
   const products = await prisma.product.findMany({
     where: {
+      ...(isAdmin ? {} : { status: "ACTIVE" }),
       AND: [
         search ? { name: { contains: search, mode: "insensitive" } } : {},
         category ? { category: { equals: category, mode: "insensitive" } } : {},

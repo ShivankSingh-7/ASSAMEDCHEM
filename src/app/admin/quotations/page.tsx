@@ -17,6 +17,7 @@ type QuotationItem = {
 type Quotation = {
   id: string;
   user: { name: string; email: string };
+  seller?: { name: string; email: string } | null;
   totalAmount: number;
   status: string;
   createdAt: string;
@@ -98,10 +99,12 @@ export default function AdminQuotationsPage() {
                         </p>
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900">
-                          {q.user.name}
+                        <p className="font-medium text-slate-900 truncate">
+                          Buyer: {q.user.name}
                         </p>
-                        <p className="text-xs text-slate-500">{q.user.email}</p>
+                        <p className="font-medium text-slate-900 truncate mt-1">
+                          Seller: {q.seller ? q.seller.name : "System"}
+                        </p>
                       </div>
                       <div>
                         <p className="font-semibold text-slate-900">

@@ -9,9 +9,12 @@ export async function GET(_req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const quotations = await prisma.quotation.findMany({
-    where: session.user.role === "ADMIN" ? {} : { userId: session.user.id },
+    where: session.user.role === "ADMIN" 
+      ? {} 
+      : { OR: [{ userId: session.user.id }, { sellerId: session.user.id }] },
     include: {
       user: { select: { name: true, email: true } },
+      seller: { select: { name: true, email: true } },
       items: {
         include: {
           product: { select: { name: true, sku: true } },
@@ -46,24 +49,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No items in quotation" }, { status: 400 });
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.calculatedPrice, 0);
-
-  const quotation = await prisma.quotation.create({
-    data: {
-      userId: session.user.id,
-      totalAmount,
-      items: {
-        create: items.map((item) => ({
-          productId: item.productId,
-          orderedQuantity: item.orderedQuantity,
-          orderedUnit: item.orderedUnit,
-          convertedQuantity: item.convertedQuantity,
-          calculatedPrice: item.calculatedPrice,
-        })),
-      },
-    },
-    include: { items: true },
+  // Fetch products to determine sellerId for each item
+  const productIds = items.map((item) => item.productId);
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    select: { id: true, sellerId: true },
   });
 
-  return NextResponse.json(quotation, { status: 201 });
+  const productSellerMap = new Map(products.map((p) => [p.id, p.sellerId]));
+
+  // Group items by sellerId
+  const itemsBySeller = new Map<string | null, typeof items>();
+
+  for (const item of items) {
+    const sellerId = productSellerMap.get(item.productId) || null;
+    if (!itemsBySeller.has(sellerId)) {
+      itemsBySeller.set(sellerId, []);
+    }
+    itemsBySeller.get(sellerId)!.push(item);
+  }
+
+  // Create a separate quotation for each seller
+  const createdQuotations = [];
+
+  for (const [sellerId, sellerItems] of itemsBySeller.entries()) {
+    const totalAmount = sellerItems.reduce((sum, item) => sum + item.calculatedPrice, 0);
+
+    const quotation = await prisma.quotation.create({
+      data: {
+        userId: session.user.id,
+        sellerId: sellerId,
+        totalAmount,
+        items: {
+          create: sellerItems.map((item) => ({
+            productId: item.productId,
+            orderedQuantity: item.orderedQuantity,
+            orderedUnit: item.orderedUnit,
+            convertedQuantity: item.convertedQuantity,
+            calculatedPrice: item.calculatedPrice,
+          })),
+        },
+      },
+      include: { items: true },
+    });
+    createdQuotations.push(quotation);
+  }
+
+  return NextResponse.json(createdQuotations, { status: 201 });
 }
