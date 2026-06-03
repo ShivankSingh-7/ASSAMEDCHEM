@@ -12,12 +12,21 @@ export async function GET(_req: NextRequest, { params }: Params) {
   return NextResponse.json(product);
 }
 
-// PUT /api/products/[id] — admin only
+// PUT /api/products/[id] — admin or product owner
 export async function PUT(req: NextRequest, { params }: Params) {
   const { id } = await params;
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const existingProduct = await prisma.product.findUnique({ where: { id } });
+  if (!existingProduct) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  if (session.user.role !== "ADMIN" && existingProduct.sellerId !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const body = await req.json();

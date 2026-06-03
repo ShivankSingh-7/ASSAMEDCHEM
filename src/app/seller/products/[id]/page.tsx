@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShoppingCart, Loader2 } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Loader2, Pencil } from "lucide-react";
 import { calculatePrice, formatINR, formatDisplayPrice } from "@/lib/pricing";
 import { getAvailableUnits, formatUnit } from "@/lib/units";
 import { use } from "react";
@@ -145,9 +145,15 @@ export default function ProductDetailPage({ params }: Props) {
                   You are the owner of this product. You cannot purchase it yourself.
                 </p>
               </div>
-              <p className="text-sm text-slate-400 mt-4">
-                To edit this product, please contact the admin or use the admin panel if you have access.
-              </p>
+              <div className="mt-4 w-full">
+                <Link
+                  href={`/seller/products/${product.id}/edit`}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Edit Product
+                </Link>
+              </div>
             </div>
           ) : (
           <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
