@@ -86,15 +86,17 @@ export function getAnchorUnit(unit: string): string {
  */
 export function convertToAnchorUnit(quantity: number, unit: string): number {
   // Use Math.round to eliminate floating-point drift
-  // e.g. 5 * 1_000_000 might give 4999999.9999... in some edge cases
   return Math.round(quantity * getUnitFactor(unit));
 }
 
 /**
  * Convert an anchor quantity back to a specific target unit.
  * e.g. 500000000 (mg) -> 500 kg
- * Uses parseFloat(toPrecision(10)) to eliminate floating-point noise
- * e.g. 5000000 / 1000000 = 4.999999... is fixed to 5
+ *
+ * Uses a safe rounding strategy:
+ *   - For count/unit (factor = 1): the anchor IS the value, return as-is
+ *   - For others: divide then round to 10 significant decimal places
+ *     using Number(result.toFixed(10)) which is more stable than toPrecision
  */
 export function convertFromAnchorUnit(
   quantity: number,
@@ -102,8 +104,14 @@ export function convertFromAnchorUnit(
   targetUnit: string
 ): number {
   const targetFactor = getUnitFactor(targetUnit);
-  // toPrecision(10) removes floating-point noise beyond 10 significant digits
-  return parseFloat((quantity / targetFactor).toPrecision(10));
+  if (targetFactor === 1) {
+    // count (unit) or already in anchor — no division needed, no float risk
+    return Math.round(quantity);
+  }
+  // Divide and round to 10 decimal places to kill floating-point noise
+  // e.g. 5000000 / 1000000 = 4.999999... -> toFixed(10) -> 5.0000000000 -> 5
+  const raw = quantity / targetFactor;
+  return parseFloat(raw.toFixed(10));
 }
 
 /**

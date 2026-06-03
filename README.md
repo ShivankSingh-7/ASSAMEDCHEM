@@ -1,8 +1,8 @@
 # ASSAMEDCHAM B2B Marketplace
 
-Welcome to the **ASSAMEDCHAM B2B Platform**! This is a production-ready Pharmaceutical Business-to-Business marketplace built for the hackathon. 
+Welcome to the **ASSAMEDCHAM B2B Platform** — a production-ready Pharmaceutical Business-to-Business marketplace built for the hackathon.
 
-It acts as a highly specialized supply chain platform where chemical and medical suppliers can list bulk pharmaceutical products, platform administrators can verify the safety and legitimacy of those products, and clinics/buyers can purchase them using strictly calculated medical units.
+It is a highly specialized supply chain platform where chemical and medical suppliers can list bulk pharmaceutical products, platform administrators can verify and approve those products, and clinics/buyers can purchase them using strictly calculated medical units.
 
 ---
 
@@ -10,51 +10,134 @@ It acts as a highly specialized supply chain platform where chemical and medical
 
 The application operates on a strict, 4-step professional workflow:
 
-1. **Sellers List Products:** A Seller logs in and submits a new chemical formulation or bulk medical supply they wish to sell (for example, a batch of 500 kg of an Active Pharmaceutical Ingredient). 
-2. **Admins Enforce Quality Control:** Products do not go live automatically. An Administrator must review the submission to ensure it meets platform guidelines. Once the Admin clicks "Approve", the product is published to the public catalog.
-3. **Buyers Shop & Request Quotations:** A Buyer (like a clinic or pharmacy) browses the catalog, adds items to their cart, and requests a formal "Quotation". Even if the seller listed the product in bulk **Kilograms**, the buyer can specifically order exact doses in **Milligrams**. The system handles the complex mathematical conversions dynamically!
-4. **Sellers Fulfill Orders:** The original Seller receives the quotation request on their dashboard. Once they review and click "Approve", the system automatically deducts the exact amount of stock from the database. If the inventory reaches zero, the product is automatically unlisted to prevent backorders.
+1. **Sellers List Products:** A Seller logs in and submits a new product they wish to sell — for example, a batch of 500 kg of an Active Pharmaceutical Ingredient.
+2. **Admins Enforce Quality Control:** Products do not go live automatically. An Administrator reviews each submission and either approves or rejects it with a note. Once approved, the product is published to the public catalog.
+3. **Buyers Browse & Request Quotations:** A Buyer (clinic, pharmacy, distributor) browses the catalog, adds items to their cart, and submits a formal Quotation request. Even if the seller listed the product in bulk **Kilograms**, the buyer can order in **Milligrams** — the system handles all conversions automatically.
+4. **Sellers Fulfill Orders:** The Seller receives the quotation on their dashboard. Once approved, the system automatically deducts the exact stock amount from the database. If inventory hits zero, the product is automatically unlisted to prevent backorders.
 
 ---
 
-## The Unit Conversion Engine (How it works)
+## The Unit Conversion Engine
 
-Because pharmaceutical measurements must be exact, this platform features a robust, dynamic Unit Conversion Engine to handle pricing and inventory perfectly without floating-point math errors.
+Because pharmaceutical measurements must be exact, this platform features a robust Unit Conversion Engine built in [`src/lib/units.ts`](src/lib/units.ts) that separates **inventory storage** from **pricing** — keeping both perfectly accurate.
 
-### 1. How Units are Stored
-To prevent mathematical drift, the database NEVER stores multiple different units for a single product. Instead, **every product is strictly stored using a base anchor unit**. 
-- Weight products are always anchored in **Milligrams (mg)**.
-- Volume products are always anchored in **Milliliters (mL)**.
-- Discrete items are anchored as a **Unit**.
+### Supported Units
 
-The price is always stored in the database as **Price per Base Unit** using PostgreSQL's strict `Decimal(12, 4)` data type. This guarantees precision up to 4 decimal places, ensuring that sub-milligram pricing (e.g. ₹0.0050/mg) never loses accuracy.
+| Category | Units Available | Anchor (Storage) Unit |
+|---|---|---|
+| Weight | `mg`, `g`, `kg` | `mg` (milligram) |
+| Volume | `mL`, `L` | `mL` (millilitre) |
+| Count | `unit` | `unit` |
 
-### 2. How the Math Works
-When a seller lists a product in `kg`, or a buyer purchases a product in `L`, the system uses a centralized conversion dictionary (`src/lib/units.ts`) to immediately convert the input back to the base anchor before saving it.
+---
 
-**Example Scenario:**
-1. **The Seller** lists a product at ₹5,000 per `kg`.
-2. **The System** intercepts this and divides it by 1,000,000. It stores the price in the database as exactly `₹0.0050 per mg`.
-3. **The Buyer** decides to order `500 mg`. 
-4. **The System** calculates `500 mg × ₹0.0050` and generates a perfectly accurate invoice for `₹2.50`.
-5. When the order is approved, exactly `500` is subtracted from the `mg` inventory column in the database.
+### How Inventory is Stored
 
-By always reducing quantities down to their absolute smallest common denominator (`mg` or `mL`), the platform can safely and instantly translate measurements between buyers and sellers without any risk of data corruption.
+To prevent mathematical drift, inventory is **always stored in the category's anchor unit**, regardless of what the seller enters.
+
+| Seller Enters | Stored As |
+|---|---|
+| 500 kg | 500,000,000 mg |
+| 2 L | 2,000 mL |
+| 100 unit | 100 unit |
+
+This means a seller can list a product in `kg` but a buyer can order in `mg` — and the deduction from inventory is always mathematically exact.
+
+The `inventoryQuantity` column holds the raw anchor-unit value. The `inventoryUnit` column records which anchor is being used (`mg`, `mL`, or `unit`).
+
+---
+
+### How Pricing is Stored
+
+Price is kept **separate from inventory**. It is always stored as **₹ per seller's chosen base unit**.
+
+- Seller lists at ₹5,000 per `kg` → stored as `price = 5000`, `baseUnit = "kg"`
+- When a buyer orders 500 mg, the system converts: `500 mg → 0.0005 kg`, then calculates `0.0005 × 5000 = ₹2.50`
+
+This makes pricing human-readable while keeping inventory in precise anchor units.
+
+---
+
+### The Conversion Math
+
+All conversion logic lives in `src/lib/units.ts`:
+
+**Conversion Factors (relative to anchor):**
+```
+mg  = 1      (anchor)
+g   = 1,000
+kg  = 1,000,000
+
+mL  = 1      (anchor)
+L   = 1,000
+
+unit = 1     (anchor)
+```
+
+**`convertToAnchorUnit(quantity, unit)`**
+Converts a seller's input into the anchor unit before saving:
+```
+500 kg  → 500 × 1,000,000 = 500,000,000 mg
+2.5 L   → 2.5 × 1,000     = 2,500 mL
+```
+Uses `Math.round()` to eliminate any floating-point drift.
+
+**`convertFromAnchorUnit(quantity, anchorUnit, targetUnit)`**
+Converts stored anchor values back for display:
+```
+5,000,000 mg → 5,000,000 ÷ 1,000,000 = 5 kg
+2,000 mL     → 2,000 ÷ 1,000         = 2 L
+```
+Uses `parseFloat(result.toPrecision(10))` to strip floating-point noise (e.g. `4.9999...` → `5`).
+
+**`toBaseUnit(quantity, orderedUnit, baseUnit)`**
+Used during quotation pricing — converts an ordered quantity into the seller's base unit for price calculation:
+```
+500 mg ordered, baseUnit = kg → 500 ÷ 1,000,000 = 0.0005 kg → × ₹5,000 = ₹2.50
+```
+
+---
+
+### Full Example: End-to-End
+
+| Step | Action | Value |
+|---|---|---|
+| Seller lists | 500 kg at ₹5,000/kg | `inventoryQuantity = 500,000,000 mg`, `price = 5000`, `baseUnit = "kg"` |
+| Buyer orders | 250 g | `convertedQuantity = 0.25 kg`, `calculatedPrice = ₹1,250` |
+| Order approved | Stock deducted | `500,000,000 − 250,000 = 499,750,000 mg` remaining |
+| Display | Shown to seller | `499,750,000 ÷ 1,000,000 = 499.75 kg` |
+
+---
+
+## Database Schema
+
+Key fields in the `Product` and `ProductListing` models:
+
+| Field | Type | Purpose |
+|---|---|---|
+| `price` | `Decimal(20,4)` | Price per `baseUnit` |
+| `baseUnit` | `String` | The unit the seller priced in (`kg`, `L`, `unit`) |
+| `inventoryQuantity` | `Decimal(20,4)` | Stock stored in anchor unit |
+| `inventoryUnit` | `String` | Always `mg`, `mL`, or `unit` |
+
+> `Decimal(20,4)` supports up to 16 digits before the decimal — enough for quantities like 500,000,000,000 mg (500 metric tonnes).
 
 ---
 
 ## Tech Stack
 
-* **Frontend:** Next.js (React) & Tailwind CSS (Deep Medical Blue theme).
-* **Backend:** Next.js API Routes (Serverless backend to handle logic and math securely).
-* **Database:** PostgreSQL (hosted on Neon) using **Prisma ORM** to enforce strict `Decimal` types.
-* **Security:** NextAuth.js to handle secure logins and enforce Role-Based Access Control (Admins vs Sellers).
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 15 (App Router), React |
+| Styling | Vanilla CSS — Medical Blue theme |
+| Backend | Next.js API Routes (serverless) |
+| Database | PostgreSQL on Neon via Prisma ORM |
+| Auth | NextAuth.js with Role-Based Access Control |
+| Deployment | Vercel |
 
 ---
 
 ## Live Demo
-
-The application is deployed and accessible live. You can test the platform, browse the catalog, and experience the dynamic unit conversion engine firsthand at:
 
 🔗 **[https://assamedchem-virid.vercel.app/](https://assamedchem-virid.vercel.app/)**
 
