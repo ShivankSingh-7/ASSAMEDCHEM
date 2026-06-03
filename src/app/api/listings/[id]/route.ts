@@ -37,8 +37,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           category: listing.category,
           description: listing.description,
           baseUnit: listing.baseUnit,
-          basePrice: listing.basePrice,
-          stockQuantity: listing.stockQuantity,
+          price: listing.price,
+          inventoryQuantity: listing.inventoryQuantity,
+          inventoryUnit: listing.inventoryUnit,
           sellerId: listing.sellerId,
         },
       });

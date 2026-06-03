@@ -1,16 +1,16 @@
 // ─── Unit System ─────────────────────────────────────────────────────────────
 // Products can have any supported unit as their base unit.
 // Price is stored as "price per baseUnit".
-// When ordering, we convert the ordered quantity into baseUnit quantity,
-// then multiply by basePrice.
+// Inventory is stored purely in the category's anchor unit.
 //
 // Conversion: toBaseUnit(qty, orderedUnit, baseUnit)
-//   e.g. ordered 500 g, baseUnit = kg → 500 × (1/1000) = 0.5 kg → 0.5 × pricePerKg
+//   e.g. ordered 500 g, baseUnit = kg → 500 × (1000/1000000) = 0.5 kg → 0.5 × pricePerKg
 
 // ─── Conversion factors (relative to category anchor) ───────────────────────
 // Weight anchor = 1 mg
 export const WEIGHT_FACTORS: Record<string, number> = {
   mg: 1,
+  g: 1000,
   kg: 1_000_000,
 };
 
@@ -31,6 +31,7 @@ export const UNIT_GROUPS = [
     group: "Weight",
     units: [
       { value: "mg", label: "mg — milligram" },
+      { value: "g", label: "g — gram" },
       { value: "kg", label: "kg — kilogram" },
     ],
   },
@@ -69,10 +70,45 @@ function getUnitFactor(unit: string): number {
 }
 
 /**
+ * Get the anchor unit for any given unit.
+ */
+export function getAnchorUnit(unit: string): string {
+  const cat = getUnitCategory(unit);
+  if (cat === "weight") return "mg";
+  if (cat === "volume") return "mL";
+  return "unit";
+}
+
+/**
+ * Convert an arbitrary quantity to its category's anchor unit.
+ * e.g. 500 kg -> 500000000 (mg)
+ * Always returns a whole number (anchor units don't use fractions).
+ */
+export function convertToAnchorUnit(quantity: number, unit: string): number {
+  // Use Math.round to eliminate floating-point drift
+  // e.g. 5 * 1_000_000 might give 4999999.9999... in some edge cases
+  return Math.round(quantity * getUnitFactor(unit));
+}
+
+/**
+ * Convert an anchor quantity back to a specific target unit.
+ * e.g. 500000000 (mg) -> 500 kg
+ * Uses parseFloat(toPrecision(10)) to eliminate floating-point noise
+ * e.g. 5000000 / 1000000 = 4.999999... is fixed to 5
+ */
+export function convertFromAnchorUnit(
+  quantity: number,
+  anchorUnit: string,
+  targetUnit: string
+): number {
+  const targetFactor = getUnitFactor(targetUnit);
+  // toPrecision(10) removes floating-point noise beyond 10 significant digits
+  return parseFloat((quantity / targetFactor).toPrecision(10));
+}
+
+/**
  * Convert a quantity from orderedUnit into baseUnit.
  * e.g. toBaseUnit(500, "g", "kg") → 0.5
- *      toBaseUnit(2, "L", "mL")  → 2000
- *      toBaseUnit(1, "dozen", "dozen") → 1
  */
 export function toBaseUnit(
   quantity: number,
@@ -85,25 +121,18 @@ export function toBaseUnit(
   const cat = getUnitCategory(baseUnit);
   const orderedCat = getUnitCategory(orderedUnit);
 
-  // Cross-category conversions don't make sense — just return as-is
   if (cat !== orderedCat) return quantity;
 
-  // Count units that have different factors (dozen, gross) still work:
-  // e.g. base=unit(1), ordered=dozen(12) → 12 × 12/1 = 144? No.
-  // The factor is "how many anchor units = 1 of this unit"
-  // Convert: qty ordered × orderedFactor / baseFactor
   return (quantity * orderedFactor) / baseFactor;
 }
 
 /**
- * Returns all units in the same category as baseUnit,
- * allowing a buyer to order in any compatible unit.
+ * Returns all units in the same category as baseUnit.
  */
 export function getAvailableUnits(baseUnit: string): string[] {
   const cat = getUnitCategory(baseUnit);
   if (cat === "weight") return Object.keys(WEIGHT_FACTORS);
   if (cat === "volume") return Object.keys(VOLUME_FACTORS);
-  // For count — only the same unit (tablet orders in tablets, not in dozens etc.)
   return [baseUnit];
 }
 
@@ -116,7 +145,6 @@ export function formatUnit(unit: string): string {
 
 /**
  * Return the "friendly" per-unit label for pricing display.
- * e.g. "kg" → "per kg", "tablet" → "per tablet"
  */
 export function perUnitLabel(unit: string): string {
   return `per ${unit}`;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { convertToAnchorUnit } from "@/lib/units";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -39,14 +40,16 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     for (const item of quotation.items) {
       const product = await prisma.product.findUnique({ where: { id: item.productId } });
       if (product) {
-        // Fix floating point precision (e.g. 200 - 0 = 199.9999) by rounding to 4 decimals
-        let newStock = Number(product.stockQuantity) - Number(item.convertedQuantity);
+        // Convert ordered quantity directly to anchor unit to deduct stock safely
+        const deduction = convertToAnchorUnit(Number(item.orderedQuantity), item.orderedUnit);
+        
+        let newStock = Number(product.inventoryQuantity) - deduction;
         newStock = Math.round(newStock * 10000) / 10000;
         
         await prisma.product.update({
           where: { id: item.productId },
           data: {
-            stockQuantity: newStock < 0 ? 0 : newStock,
+            inventoryQuantity: newStock < 0 ? 0 : newStock,
             status: newStock <= 0 ? "UNLISTED" : "ACTIVE",
           },
         });

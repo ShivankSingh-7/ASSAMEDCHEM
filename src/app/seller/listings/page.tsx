@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { PlusCircle, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { formatDisplayPrice } from "@/lib/pricing";
+import { convertFromAnchorUnit } from "@/lib/units";
 
 type Listing = {
   id: string;
@@ -11,8 +12,9 @@ type Listing = {
   sku: string;
   category: string;
   baseUnit: string;
-  basePrice: number;
-  stockQuantity: number;
+  price: number;
+  inventoryQuantity: number;
+  inventoryUnit: string;
   status: string;
   adminNote: string | null;
   createdAt: string;
@@ -25,7 +27,7 @@ const CATEGORIES = ["Food", "Chemical", "Medical", "Pharmaceutical", "Industrial
 
 const EMPTY_FORM = {
   name: "", sku: "", category: "", description: "",
-  baseUnit: "kg", basePrice: "", stockQuantity: "",
+  baseUnit: "kg", price: "", stock: "",
 };
 
 export default function SellerListingsPage() {
@@ -62,8 +64,8 @@ export default function SellerListingsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
-        basePrice: parseFloat(form.basePrice),
-        stockQuantity: parseFloat(form.stockQuantity),
+        price: parseFloat(form.price),
+        stock: parseFloat(form.stock),
       }),
     });
 
@@ -168,14 +170,14 @@ export default function SellerListingsPage() {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">₹</span>
-                  <input name="basePrice" type="number" value={form.basePrice} onChange={handleChange} required min="0" step="0.0001" placeholder="0.0000" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input name="price" type="number" value={form.price} onChange={handleChange} required min="0" step="0.0001" placeholder="0.0000" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">
                   Stock Qty * <span className="font-normal text-slate-400">(in {form.baseUnit})</span>
                 </label>
-                <input name="stockQuantity" type="number" value={form.stockQuantity} onChange={handleChange} required min="0" step="0.01" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input name="stock" type="number" value={form.stock} onChange={handleChange} required min="0" step="0.01" className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
@@ -183,9 +185,9 @@ export default function SellerListingsPage() {
               </div>
             </div>
 
-            {form.basePrice && (form.baseUnit === "mg" || form.baseUnit === "mL") && (
+            {form.price && (form.baseUnit === "mg" || form.baseUnit === "mL") && (
               <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 text-sm text-blue-700">
-                💡 Equals <strong>₹{(parseFloat(form.basePrice) * (form.baseUnit === "mg" ? 1000000 : 1000)).toFixed(2)} per {form.baseUnit === "mg" ? "kg" : "L"}</strong>
+                💡 Equals <strong>₹{(parseFloat(form.price) * (form.baseUnit === "mg" ? 1000000 : 1000)).toFixed(2)} per {form.baseUnit === "mg" ? "kg" : "L"}</strong>
               </div>
             )}
 
@@ -237,10 +239,10 @@ export default function SellerListingsPage() {
                         <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-blue-100">{l.category}</span>
                       </td>
                       <td className="px-6 py-4 font-medium text-slate-900">
-                        {formatDisplayPrice(Number(l.basePrice), l.baseUnit)}
+                        {formatDisplayPrice(Number(l.price), l.baseUnit)}
                       </td>
                       <td className="px-6 py-4 text-slate-600">
-                        {Number(l.stockQuantity).toLocaleString()} {l.baseUnit}
+                        {convertFromAnchorUnit(Number(l.inventoryQuantity), l.inventoryUnit, l.baseUnit).toLocaleString()} {l.baseUnit}
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={statusMap[l.status] ?? l.status} />

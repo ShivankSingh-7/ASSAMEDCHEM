@@ -7,7 +7,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { use } from "react";
 
 import UnitSelect from "@/components/ui/UnitSelect";
-import { perUnitLabel } from "@/lib/units";
+import { perUnitLabel, convertFromAnchorUnit } from "@/lib/units";
 
 const CATEGORIES = ["Food", "Chemical", "Medical", "Pharmaceutical", "Industrial", "Other"];
 
@@ -18,7 +18,7 @@ export default function EditProductPage({ params }: Props) {
   const router = useRouter();
   const [form, setForm] = useState({
     name: "", sku: "", category: "", description: "",
-    baseUnit: "kg", basePrice: "", stockQuantity: "",
+    baseUnit: "kg", price: "", stock: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,8 +32,8 @@ export default function EditProductPage({ params }: Props) {
           name: p.name, sku: p.sku, category: p.category,
           description: p.description ?? "",
           baseUnit: p.baseUnit,
-          basePrice: String(p.basePrice),
-          stockQuantity: String(p.stockQuantity),
+          price: String(p.price),
+          stock: String(convertFromAnchorUnit(Number(p.inventoryQuantity), p.inventoryUnit, p.baseUnit)),
         });
         setFetching(false);
       });
@@ -53,8 +53,8 @@ export default function EditProductPage({ params }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
-        basePrice: parseFloat(form.basePrice),
-        stockQuantity: parseFloat(form.stockQuantity),
+        price: parseFloat(form.price),
+        stock: parseFloat(form.stock),
       }),
     });
 
@@ -117,12 +117,12 @@ export default function EditProductPage({ params }: Props) {
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Base Price * <span className="text-slate-400 font-normal">({unitLabel})</span></label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">₹</span>
-                <input name="basePrice" type="number" value={form.basePrice} onChange={handleChange} required step="0.0001" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input name="price" type="number" value={form.price} onChange={handleChange} required step="0.0001" className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Stock Qty * <span className="text-slate-400 font-normal">(in {form.baseUnit})</span></label>
-              <input name="stockQuantity" type="number" value={form.stockQuantity} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input name="stock" type="number" value={form.stock} onChange={handleChange} required className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>

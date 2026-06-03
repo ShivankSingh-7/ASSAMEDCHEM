@@ -25,8 +25,8 @@ export default function NewProductPage() {
     category: "",
     description: "",
     baseUnit: "kg",
-    basePrice: "",
-    stockQuantity: "",
+    price: "",
+    stock: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,8 +49,8 @@ export default function NewProductPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
-        basePrice: parseFloat(form.basePrice),
-        stockQuantity: parseFloat(form.stockQuantity),
+        price: parseFloat(form.price),
+        stock: parseFloat(form.stock),
       }),
     });
 
@@ -156,9 +156,9 @@ export default function NewProductPage() {
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">₹</span>
                 <input
-                  name="basePrice"
+                  name="price"
                   type="number"
-                  value={form.basePrice}
+                  value={form.price}
                   onChange={handleChange}
                   required
                   min="0"
@@ -174,9 +174,9 @@ export default function NewProductPage() {
                 Stock Quantity * <span className="text-slate-400 font-normal">(in {form.baseUnit})</span>
               </label>
               <input
-                name="stockQuantity"
+                name="stock"
                 type="number"
-                value={form.stockQuantity}
+                value={form.stock}
                 onChange={handleChange}
                 required
                 min="0"
@@ -202,11 +202,11 @@ export default function NewProductPage() {
           </div>
 
           {/* Price hint */}
-          {form.basePrice && (form.baseUnit === "g" || form.baseUnit === "mL") && (
+          {form.price && (form.baseUnit === "g" || form.baseUnit === "mL") && (
             <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 text-sm text-blue-700">
               💡 This equals{" "}
               <strong>
-                ₹{(parseFloat(form.basePrice) * 1000).toFixed(2)} per{" "}
+                ₹{(parseFloat(form.price) * 1000).toFixed(2)} per{" "}
                 {form.baseUnit === "g" ? "kg" : "L"}
               </strong>
             </div>

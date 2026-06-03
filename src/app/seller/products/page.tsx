@@ -11,9 +11,10 @@ type Product = {
   sku: string;
   category: string;
   baseUnit: string;
-  basePrice: number;
+  price: number;
   description: string;
-  stockQuantity: number;
+  inventoryQuantity: number;
+  inventoryUnit: string;
 };
 
 const CATEGORIES = ["All", "Food", "Chemical", "Medical", "Pharmaceutical", "Industrial", "Other"];
@@ -111,7 +112,7 @@ export default function SellerProductsPage() {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-lg font-bold text-slate-900">
-                        {formatDisplayPrice(Number(p.basePrice), p.baseUnit)}
+                        {formatDisplayPrice(Number(p.price), p.baseUnit)}
                       </p>
                       <p className="text-xs text-slate-500">
                         Unit: {p.baseUnit}

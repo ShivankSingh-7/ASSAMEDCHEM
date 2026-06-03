@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { formatDisplayPrice } from "@/lib/pricing";
 import { CheckCircle, XCircle, Loader2, ChevronDown } from "lucide-react";
+import { convertFromAnchorUnit } from "@/lib/units";
 
 type Listing = {
   id: string;
@@ -11,8 +12,9 @@ type Listing = {
   sku: string;
   category: string;
   baseUnit: string;
-  basePrice: number;
-  stockQuantity: number;
+  price: number;
+  inventoryQuantity: number;
+  inventoryUnit: string;
   description: string | null;
   status: string;
   adminNote: string | null;
@@ -124,11 +126,11 @@ export default function AdminListingsPage() {
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Price</p>
-                          <p className="font-medium text-slate-900">{formatDisplayPrice(Number(l.basePrice), l.baseUnit)}</p>
+                          <p className="font-medium text-slate-900">{formatDisplayPrice(Number(l.price), l.baseUnit)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Stock</p>
-                          <p className="font-medium text-slate-900">{Number(l.stockQuantity).toLocaleString()} {l.baseUnit}</p>
+                          <p className="font-medium text-slate-900">{convertFromAnchorUnit(Number(l.inventoryQuantity), l.inventoryUnit, l.baseUnit).toLocaleString()} {l.baseUnit}</p>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Submitted</p>

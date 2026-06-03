@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getAnchorUnit, convertToAnchorUnit } from "@/lib/units";
 
 // GET /api/products — public list with optional search + category filter
 export async function GET(req: NextRequest) {
@@ -34,15 +35,18 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, sku, category, description, baseUnit, basePrice, stockQuantity } = body;
+  const { name, sku, category, description, baseUnit, price, stock } = body;
 
-  if (!name || !sku || !category || !baseUnit || basePrice == null || stockQuantity == null) {
+  if (!name || !sku || !category || !baseUnit || price == null || stock == null) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  const inventoryUnit = getAnchorUnit(baseUnit);
+  const inventoryQuantity = convertToAnchorUnit(Number(stock), baseUnit);
+
   try {
     const product = await prisma.product.create({
-      data: { name, sku, category, description, baseUnit, basePrice, stockQuantity },
+      data: { name, sku, category, description, baseUnit, price, inventoryQuantity, inventoryUnit },
     });
     return NextResponse.json(product, { status: 201 });
   } catch (err: unknown) {

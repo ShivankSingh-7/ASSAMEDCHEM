@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Plus, Search, Pencil, Trash2, AlertTriangle } from "lucide-react";
 import { formatDisplayPrice } from "@/lib/pricing";
+import { convertFromAnchorUnit } from "@/lib/units";
 
 type Product = {
   id: string;
@@ -11,8 +12,9 @@ type Product = {
   sku: string;
   category: string;
   baseUnit: string;
-  basePrice: number;
-  stockQuantity: number;
+  price: number;
+  inventoryQuantity: number;
+  inventoryUnit: string;
   status: string;
   seller?: { name: string; email: string } | null;
 };
@@ -137,10 +139,10 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-6 py-4 text-slate-600">{p.baseUnit}</td>
                     <td className="px-6 py-4 text-slate-900 font-medium">
-                      {formatDisplayPrice(Number(p.basePrice), p.baseUnit)}
+                      {formatDisplayPrice(Number(p.price), p.baseUnit)}
                     </td>
                     <td className="px-6 py-4 text-slate-600">
-                      {Number(p.stockQuantity).toLocaleString()} {p.baseUnit}
+                      {convertFromAnchorUnit(Number(p.inventoryQuantity), p.inventoryUnit, p.baseUnit).toLocaleString()} {p.baseUnit}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${p.status === "ACTIVE" ? "bg-green-50 text-green-700 border-green-100" : "bg-slate-100 text-slate-700 border-slate-200"}`}>

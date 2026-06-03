@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getAnchorUnit, convertToAnchorUnit } from "@/lib/units";
 
 // GET /api/listings — admin gets all, seller gets own
 export async function GET(_req: NextRequest) {
@@ -24,11 +25,14 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, sku, category, description, baseUnit, basePrice, stockQuantity } = body;
+  const { name, sku, category, description, baseUnit, price, stock } = body;
 
-  if (!name || !sku || !category || !baseUnit || basePrice == null || stockQuantity == null) {
+  if (!name || !sku || !category || !baseUnit || price == null || stock == null) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
+
+  const inventoryUnit = getAnchorUnit(baseUnit);
+  const inventoryQuantity = convertToAnchorUnit(Number(stock), baseUnit);
 
   try {
     const listing = await prisma.productListing.create({
@@ -39,16 +43,18 @@ export async function POST(req: NextRequest) {
         category,
         description,
         baseUnit,
-        basePrice,
-        stockQuantity,
+        price,
+        inventoryQuantity,
+        inventoryUnit,
         status: "DRAFT",
       },
     });
     return NextResponse.json(listing, { status: 201 });
   } catch (err: unknown) {
+    console.error("LISTINGS POST ERROR:", err);
     if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002") {
       return NextResponse.json({ error: "SKU already submitted" }, { status: 409 });
     }
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Server error" }, { status: 500 });
   }
 }

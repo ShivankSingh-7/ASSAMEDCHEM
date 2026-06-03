@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShoppingCart, Loader2, Pencil } from "lucide-react";
 import { calculatePrice, formatINR, formatDisplayPrice } from "@/lib/pricing";
-import { getAvailableUnits, formatUnit } from "@/lib/units";
+import { getAvailableUnits, formatUnit, convertFromAnchorUnit } from "@/lib/units";
 import { use } from "react";
 
 type Product = {
@@ -15,8 +15,9 @@ type Product = {
   category: string;
   description: string;
   baseUnit: string;
-  basePrice: number;
-  stockQuantity: number;
+  price: number;
+  inventoryQuantity: number;
+  inventoryUnit: string;
   sellerId?: string | null;
 };
 
@@ -56,17 +57,19 @@ export default function ProductDetailPage({ params }: Props) {
 
   if (!product) return <div className="p-6 text-slate-500">Product not found.</div>;
 
+  const stockInBaseUnit = product ? convertFromAnchorUnit(Number(product.inventoryQuantity), product.inventoryUnit, product.baseUnit) : 0;
+
   const availableUnits = getAvailableUnits(product.baseUnit);
   const { convertedQuantity, calculatedPrice } = calculatePrice(
     quantity || 0,
     unit,
     product.baseUnit,
-    Number(product.basePrice)
+    Number(product.price)
   );
 
   function addToCart() {
-    if (convertedQuantity > Number(product!.stockQuantity)) {
-      alert(`Order quantity (${convertedQuantity} ${product!.baseUnit}) exceeds available stock (${product!.stockQuantity} ${product!.baseUnit}).`);
+    if (convertedQuantity > stockInBaseUnit) {
+      alert(`Order quantity (${convertedQuantity} ${product!.baseUnit}) exceeds available stock (${stockInBaseUnit} ${product!.baseUnit}).`);
       return;
     }
     setAdding(true);
@@ -117,7 +120,7 @@ export default function ProductDetailPage({ params }: Props) {
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Base Price</span>
                 <span className="font-semibold text-slate-900">
-                  {formatDisplayPrice(Number(product.basePrice), product.baseUnit)}
+                  {formatDisplayPrice(Number(product.price), product.baseUnit)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -127,7 +130,7 @@ export default function ProductDetailPage({ params }: Props) {
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Stock</span>
                 <span className="font-semibold text-slate-900">
-                  {Number(product.stockQuantity).toLocaleString()} {product.baseUnit}
+                  {stockInBaseUnit.toLocaleString()} {product.baseUnit}
                 </span>
               </div>
             </div>
@@ -220,7 +223,7 @@ export default function ProductDetailPage({ params }: Props) {
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600">
-                    Rate ({formatINR(Number(product.basePrice))}/{product.baseUnit})
+                    Rate ({formatINR(Number(product.price))}/{product.baseUnit})
                   </span>
                   <span className="font-medium text-slate-900">×{convertedQuantity}</span>
                 </div>

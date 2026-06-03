@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getAnchorUnit, convertToAnchorUnit } from "@/lib/units";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -30,12 +31,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
   }
 
   const body = await req.json();
-  const { name, sku, category, description, baseUnit, basePrice, stockQuantity } = body;
+  const { name, sku, category, description, baseUnit, price, stock } = body;
+
+  const inventoryUnit = getAnchorUnit(baseUnit);
+  const inventoryQuantity = convertToAnchorUnit(Number(stock), baseUnit);
 
   try {
     const product = await prisma.product.update({
       where: { id },
-      data: { name, sku, category, description, baseUnit, basePrice, stockQuantity },
+      data: { name, sku, category, description, baseUnit, price, inventoryQuantity, inventoryUnit },
     });
     return NextResponse.json(product);
   } catch {
