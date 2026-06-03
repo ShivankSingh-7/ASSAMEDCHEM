@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id              String           @id @default(cuid())
+  name            String
+  email           String           @unique
+  password        String
+  role            Role             @default(SELLER)
+  createdAt       DateTime         @default(now())
+  quotations      Quotation[]
+  productListings ProductListing[]
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  name           String
+  sku            String          @unique
+  category       String
+  description    String?
+  baseUnit       String // "g", "mL", "unit"
+  basePrice      Decimal         @db.Decimal(12, 4) // price per baseUnit
+  stockQuantity  Decimal         @db.Decimal(12, 4)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  quotationItems QuotationItem[]
+}
+
+// Seller-submitted products waiting for Admin approval
+model ProductListing {
+  id            String               @id @default(cuid())
+  sellerId      String
+  seller        User                 @relation(fields: [sellerId], references: [id])
+  name          String
+  sku           String
+  category      String
+  description   String?
+  baseUnit      String
+  basePrice     Decimal              @db.Decimal(12, 4)
+  stockQuantity Decimal              @db.Decimal(12, 4)
+  status        ProductListingStatus @default(DRAFT)
+  adminNote     String?              // Admin can leave a rejection reason
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+}
+
+model Quotation {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  totalAmount Decimal         @db.Decimal(12, 4)
+  status      QuotationStatus @default(PENDING)
+  createdAt   DateTime        @default(now())
+  items       QuotationItem[]
+}
+
+model QuotationItem {
+  id                String    @id @default(cuid())
+  quotationId       String
+  quotation         Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product   @relation(fields: [productId], references: [id])
+  orderedQuantity   Decimal   @db.Decimal(12, 4)
+  orderedUnit       String
+  convertedQuantity Decimal   @db.Decimal(12, 4) // always in baseUnit
+  calculatedPrice   Decimal   @db.Decimal(12, 4)
+}
+
+enum Role {
+  ADMIN
+  SELLER
+}
+
+enum QuotationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ProductListingStatus {
+  DRAFT    // submitted by seller, awaiting admin review
+  APPROVED // admin approved — now visible in catalog as Product
+  REJECTED // admin rejected
+}
