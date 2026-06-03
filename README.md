@@ -1,77 +1,61 @@
-# IQM System — Inventory & Quotation Management
+# ASSAMEDCHAM B2B Marketplace
 
-Welcome to the **IQM System**! This is a simple but powerful B2B (Business-to-Business) marketplace built for a hackathon. 
+Welcome to the **ASSAMEDCHAM B2B Platform**! This is a production-ready Pharmaceutical Business-to-Business marketplace built for the hackathon. 
 
-It works just like a wholesale Amazon: Sellers can list bulk products (like food ingredients or chemicals), Admins make sure the products are legitimate, and Buyers can purchase those products in flexible quantities (like buying 500 grams of a product sold in kilograms).
+It acts as a highly specialized supply chain platform where chemical and medical suppliers can list bulk pharmaceutical products, platform administrators can verify the safety and legitimacy of those products, and clinics/buyers can purchase them using strictly calculated medical units.
 
 ---
 
-## How It Works (The Core Flow)
+## The Core B2B Workflow
 
-The application has a smart, 4-step workflow:
+The application operates on a strict, 4-step professional workflow:
 
-1. **Sellers List Products:** A Seller logs in and submits a new product they want to sell (for example, 200 kg of Turmeric). 
-2. **Admins Approve Listings:** The product doesn't go live immediately. An Admin reviews the submission. Once the Admin clicks "Approve", the product appears in the public catalog.
-3. **Buyers Shop & Request Orders:** A Buyer browses the catalog, adds items to their cart, and requests an order (a "Quotation"). The system is smart enough to handle unit conversions automatically. If a seller listed a product in **Kilograms**, the buyer can still choose to order in **Grams**. The system handles the math!
-4. **Sellers Fulfill Orders:** The original Seller receives the order request. Once they click "Approve", the system automatically deducts the exact amount of stock from the database. If the stock hits zero, the product is automatically hidden from the catalog.
+1. **Sellers List Products:** A Seller logs in and submits a new chemical formulation or bulk medical supply they wish to sell (for example, a batch of 500 kg of an Active Pharmaceutical Ingredient). 
+2. **Admins Enforce Quality Control:** Products do not go live automatically. An Administrator must review the submission to ensure it meets platform guidelines. Once the Admin clicks "Approve", the product is published to the public catalog.
+3. **Buyers Shop & Request Quotations:** A Buyer (like a clinic or pharmacy) browses the catalog, adds items to their cart, and requests a formal "Quotation". Even if the seller listed the product in bulk **Kilograms**, the buyer can specifically order exact doses in **Milligrams**. The system handles the complex mathematical conversions dynamically!
+4. **Sellers Fulfill Orders:** The original Seller receives the quotation request on their dashboard. Once they review and click "Approve", the system automatically deducts the exact amount of stock from the database. If the inventory reaches zero, the product is automatically unlisted to prevent backorders.
+
+---
+
+## The Unit Conversion Engine (How it works)
+
+Because pharmaceutical measurements must be exact, this platform features a robust, dynamic Unit Conversion Engine to handle pricing and inventory perfectly without floating-point math errors.
+
+### 1. How Units are Stored
+To prevent mathematical drift, the database NEVER stores multiple different units for a single product. Instead, **every product is strictly stored using a base anchor unit**. 
+- Weight products are always anchored in **Milligrams (mg)**.
+- Volume products are always anchored in **Milliliters (mL)**.
+- Discrete items are anchored as a **Unit**.
+
+The price is always stored in the database as **Price per Base Unit** using PostgreSQL's strict `Decimal(12, 4)` data type. This guarantees precision up to 4 decimal places, ensuring that sub-milligram pricing (e.g. ₹0.0050/mg) never loses accuracy.
+
+### 2. How the Math Works
+When a seller lists a product in `kg`, or a buyer purchases a product in `L`, the system uses a centralized conversion dictionary (`src/lib/units.ts`) to immediately convert the input back to the base anchor before saving it.
+
+**Example Scenario:**
+1. **The Seller** lists a product at ₹5,000 per `kg`.
+2. **The System** intercepts this and divides it by 1,000,000. It stores the price in the database as exactly `₹0.0050 per mg`.
+3. **The Buyer** decides to order `500 mg`. 
+4. **The System** calculates `500 mg × ₹0.0050` and generates a perfectly accurate invoice for `₹2.50`.
+5. When the order is approved, exactly `500` is subtracted from the `mg` inventory column in the database.
+
+By always reducing quantities down to their absolute smallest common denominator (`mg` or `mL`), the platform can safely and instantly translate measurements between buyers and sellers without any risk of data corruption.
 
 ---
 
 ## Tech Stack
 
-This project was built using modern, industry-standard tools:
-
-* **Frontend:** Next.js (React) & Tailwind CSS for a beautiful, responsive user interface.
+* **Frontend:** Next.js (React) & Tailwind CSS (Deep Medical Blue theme).
 * **Backend:** Next.js API Routes (Serverless backend to handle logic and math securely).
-* **Database:** PostgreSQL (hosted on Neon) using **Prisma ORM** to keep data structured and prevent errors.
-* **Security:** NextAuth.js to handle secure logins and make sure users can only see what they are allowed to see.
+* **Database:** PostgreSQL (hosted on Neon) using **Prisma ORM** to enforce strict `Decimal` types.
+* **Security:** NextAuth.js to handle secure logins and enforce Role-Based Access Control (Admins vs Sellers).
 
 ---
 
-## Test Credentials
+## Live Demo
 
-You can log in and test the different roles using these accounts:
+The application is deployed and accessible live. You can test the platform, browse the catalog, and experience the dynamic unit conversion engine firsthand at:
 
-| Role | Email | Password |
-|------|-------|----------|
-| **Admin** | admin@iqm.com | Admin@123 |
-| **Seller/Buyer** | seller@iqm.com | Seller@123 |
-
-*(Note: In this system, any registered user can act as both a Buyer and a Seller!)*
+🔗 **[https://assamedchem-virid.vercel.app/](https://assamedchem-virid.vercel.app/)**
 
 ---
-
-## How to Run the Project Locally
-
-Follow these simple steps to run the application on your own computer:
-
-### 1. Install Dependencies
-Open your terminal, navigate to the project folder, and run:
-```bash
-npm install
-```
-
-### 2. Set Up Environment Variables
-Create a file named `.env` in the root of the project and add the following lines. (You will need to get a free PostgreSQL database URL from [Neon.tech](https://neon.tech)):
-
-```env
-DATABASE_URL="postgresql://your_db_user:your_db_password@your_neon_url.neon.tech/neondb?sslmode=require"
-NEXTAUTH_SECRET="any_random_secure_password_string_here"
-NEXTAUTH_URL="http://localhost:3000"
-```
-
-### 3. Setup the Database
-Run this command to create the necessary tables in your database:
-```bash
-npm run db:push
-```
-
-### 4. Add Dummy Data (Optional)
-Run this command to populate your database with the Admin account and some sample products so the app isn't empty:
-```bash
-npm run db:seed
-```
-
-
----
-
