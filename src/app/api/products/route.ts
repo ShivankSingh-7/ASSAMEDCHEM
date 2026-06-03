@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
         category ? { category: { equals: category, mode: "insensitive" } } : {},
       ],
     },
+    include: { seller: { select: { name: true, email: true } } },
     orderBy: { createdAt: "desc" },
   });
 

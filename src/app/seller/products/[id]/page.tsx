@@ -17,6 +17,7 @@ type Product = {
   baseUnit: string;
   basePrice: number;
   stockQuantity: number;
+  sellerId?: string | null;
 };
 
 type Props = { params: Promise<{ id: string }> };
@@ -31,14 +32,18 @@ export default function ProductDetailPage({ params }: Props) {
   const [adding, setAdding] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+
   useEffect(() => {
-    fetch(`/api/products/${id}`)
-      .then((r) => r.json())
-      .then((p) => {
-        setProduct(p);
-        setUnit(p.baseUnit);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`/api/products/${id}`).then((r) => r.json()),
+      fetch("/api/auth/session").then((r) => r.json())
+    ]).then(([p, sessionData]) => {
+      setProduct(p);
+      setUnit(p.baseUnit);
+      setCurrentUserId(sessionData?.user?.id || "");
+      setLoading(false);
+    });
   }, [id]);
 
   if (loading) {
@@ -128,7 +133,23 @@ export default function ProductDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Order calculator */}
+          {/* Order calculator or Edit block */}
+          {product.sellerId === currentUserId ? (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-4">
+              <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+                <span className="text-xl">📦</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900">Your Product</h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  You are the owner of this product. You cannot purchase it yourself.
+                </p>
+              </div>
+              <p className="text-sm text-slate-400 mt-4">
+                To edit this product, please contact the admin or use the admin panel if you have access.
+              </p>
+            </div>
+          ) : (
           <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
             <h3 className="font-semibold text-slate-900">Request Quotation</h3>
 
@@ -217,7 +238,7 @@ export default function ProductDetailPage({ params }: Props) {
               }`}
             >
               <ShoppingCart className="w-4 h-4" />
-              {success ? "Added to Cart ✓" : "Add to Cart"}
+              {adding ? "Adding..." : success ? "Added to Cart!" : "Add to Cart"}
             </button>
 
             <Link
@@ -227,6 +248,7 @@ export default function ProductDetailPage({ params }: Props) {
               View Cart →
             </Link>
           </div>
+          )}
         </div>
       </div>
     </div>

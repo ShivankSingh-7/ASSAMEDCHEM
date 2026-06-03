@@ -39,7 +39,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     for (const item of quotation.items) {
       const product = await prisma.product.findUnique({ where: { id: item.productId } });
       if (product) {
-        const newStock = Number(product.stockQuantity) - Number(item.convertedQuantity);
+        // Fix floating point precision (e.g. 200 - 0 = 199.9999) by rounding to 4 decimals
+        let newStock = Number(product.stockQuantity) - Number(item.convertedQuantity);
+        newStock = Math.round(newStock * 10000) / 10000;
+        
         await prisma.product.update({
           where: { id: item.productId },
           data: {

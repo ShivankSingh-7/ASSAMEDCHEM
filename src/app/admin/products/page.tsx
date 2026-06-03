@@ -14,6 +14,7 @@ type Product = {
   basePrice: number;
   stockQuantity: number;
   status: string;
+  seller?: { name: string; email: string } | null;
 };
 
 export default function AdminProductsPage() {
@@ -81,7 +82,7 @@ export default function AdminProductsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  {["Name", "SKU", "Category", "Base Unit", "Price", "Stock", "Status", "Actions"].map(
+                  {["Name", "SKU", "Seller", "Category", "Base Unit", "Price", "Stock", "Status", "Actions"].map(
                     (h) => (
                       <th
                         key={h}
@@ -97,7 +98,7 @@ export default function AdminProductsPage() {
                 {loading && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={9}
                       className="px-6 py-8 text-center text-slate-400"
                     >
                       Loading...
@@ -124,6 +125,10 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-6 py-4 font-mono text-xs text-slate-500">
                       {p.sku}
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-slate-900">{p.seller?.name ?? "System"}</p>
+                      <p className="text-xs text-slate-500">{p.seller?.email ?? "Admin added"}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span className="bg-green-50 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full border border-green-100">
